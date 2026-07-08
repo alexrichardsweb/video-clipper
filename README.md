@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Video Clipper is a small, local-only utility for **planning how to cut a long
+This is a small utility timesaving UI for **cutting long form
 video into smaller clips and then stitch a selection of them back together**,
 without any video editing software, uploads, or servers.
 
 It exists to bridge the gap between *watching* a video and *running ffmpeg on
-it*. Instead of scrubbing in a player, pausing, squinting at the timecode, and
+it*. Instead of scrubbing in a player, pausing and
 hand-typing start/end times into a text file, you:
 
 1. Load a local video into the browser.
 2. Scrub it with fast, MPV-style keyboard shortcuts.
 3. Mark the in/out points of each clip and give it a name.
-4. Export the exact plain-text files your ffmpeg workflow already expects.
+4. Export the exact plain-text files your ffmpeg workflow already expects, along with the matching shell script.
 
 Finding the right frame is quick because scrubbing is intuitive: dedicated
 hotkeys jump by several lengths at once (1s, 10s, 30s, 60s) in either
@@ -24,13 +24,15 @@ The app never touches your video data. The file is opened in-browser via
 `URL.createObjectURL(file)` and **nothing is uploaded anywhere**. Its only
 outputs are small text files:
 
-- **`clips.txt`**: one `START END NAME` line per clip (the cut list).
+- **`clips.txt`**: one `START END NAME` line per clip (the cut list). This will list the start and end time of your clips, along with the desired filename.
 - **`files.txt`**: a concat list of the clips you selected to merge.
-- **`clip.sh`**: an ffmpeg script that cuts every clip out of the source video.
-- **`merge.sh`**: an ffmpeg script that concatenates the selected clips.
+- **`clip.sh`**: an ffmpeg script that cuts every clip inside `clips.txt` from the source video.
+- **`merge.sh`**: an ffmpeg script that concatenates selected clips.
 
 In other words: the browser is a comfortable place to *decide* the edits, and
-ffmpeg on your machine does the actual *work*.
+ffmpeg on your machine does the actual *work*. ffmpeg is a fast, scriptable, lossless engine 
+for well-defined cut/merge/convert jobs, this means you can clip up and concatenate hours of footage in a few minutes instead 
+of using a GUI and waiting for rendering times.
 
 ### Who it's for
 
