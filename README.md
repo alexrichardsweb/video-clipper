@@ -3,7 +3,7 @@
 ## Purpose
 
 Video Clipper is a small, local-only utility for **planning how to cut a long
-video into smaller clips and then stitch a selection of them back together** —
+video into smaller clips and then stitch a selection of them back together**,
 without any video editing software, uploads, or servers.
 
 It exists to bridge the gap between *watching* a video and *running ffmpeg on
@@ -11,29 +11,34 @@ it*. Instead of scrubbing in a player, pausing, squinting at the timecode, and
 hand-typing start/end times into a text file, you:
 
 1. Load a local video into the browser.
-2. Scrub it with fast MPV-style keyboard shortcuts.
+2. Scrub it with fast, MPV-style keyboard shortcuts.
 3. Mark the in/out points of each clip and give it a name.
 4. Export the exact plain-text files your ffmpeg workflow already expects.
 
-The app never touches your video data — the file is opened in-browser via
+Finding the right frame is quick because scrubbing is intuitive: dedicated
+hotkeys jump by several lengths at once (1s, 10s, 30s, 60s) in either
+direction, so you can leap across a recording and then nudge to the precise
+in/out point without ever reaching for the mouse.
+
+The app never touches your video data. The file is opened in-browser via
 `URL.createObjectURL(file)` and **nothing is uploaded anywhere**. Its only
 outputs are small text files:
 
-- **`clips.txt`** — one `START END NAME` line per clip (the cut list).
-- **`files.txt`** — a concat list of the clips you selected to merge.
-- **`clip.sh`** — an ffmpeg script that cuts every clip out of the source video.
-- **`merge.sh`** — an ffmpeg script that concatenates the selected clips.
+- **`clips.txt`**: one `START END NAME` line per clip (the cut list).
+- **`files.txt`**: a concat list of the clips you selected to merge.
+- **`clip.sh`**: an ffmpeg script that cuts every clip out of the source video.
+- **`merge.sh`**: an ffmpeg script that concatenates the selected clips.
 
 In other words: the browser is a comfortable place to *decide* the edits, and
 ffmpeg on your machine does the actual *work*.
 
 ### Who it's for
 
-Anyone who regularly slices up long recordings — captured TV, streams,
-lectures, game footage — and prefers a scriptable ffmpeg pipeline over a heavy
-GUI editor. It's especially handy for repetitive jobs like pulling out ad
-breaks or extracting recurring segments, where consistent naming
-(`adverts_1`, `adverts_2`, …) matters.
+Anyone who regularly slices up long recordings (captured TV, streams, lectures,
+game footage) and prefers a scriptable ffmpeg pipeline over a heavy GUI editor.
+It's especially handy for repetitive jobs like pulling out ad breaks or
+extracting recurring segments, where consistent naming (`adverts_1`,
+`adverts_2`, ...) matters.
 
 ## Run it
 
@@ -50,8 +55,8 @@ Then open http://localhost:3000.
 1. Click **Choose video file** and pick a local video.
 2. Scrub to a point, press **A** to set the start; scrub again, press **S** to
    set the end.
-3. Type a **prefix** (e.g. `adverts`) — the name auto-fills to `adverts_1`.
-   Leave it blank to get `clip_1`, `clip_2`, …
+3. Type a **prefix** (e.g. `adverts`) and the name auto-fills to `adverts_1`.
+   Leave it blank to get `clip_1`, `clip_2`, ...
 4. Press **Enter** (or **Add Clip**) to add it. The next name auto-advances and
    the start jumps to the previous end for fast sequential clipping.
 5. Reorder / edit / delete clips in the table (click a name to edit it, click a
@@ -67,11 +72,17 @@ bash merge.sh    # concat the selected clips into merged.mp4
 
 ## Hotkeys (MPV-inspired)
 
+Scrubbing is built around several seek lengths so you can move at whatever scale
+the moment needs: big jumps to find the rough area, then small nudges to land on
+the exact frame. Back and forward are mirrored on adjacent keys (the left key of
+each pair seeks back, the right seeks forward), which makes them intuitive to
+reach for without looking.
+
 | Key       | Action              |
 | --------- | ------------------- |
 | `Space`   | Play / pause        |
-| `←` / `→` | Seek 10s            |
 | `,` / `.` | Seek 1s             |
+| `←` / `→` | Seek 10s            |
 | `k` / `l` | Seek 30s            |
 | `i` / `o` | Seek 60s            |
 | `A`       | Set start           |
@@ -79,7 +90,7 @@ bash merge.sh    # concat the selected clips into merged.mp4
 | `Enter`   | Add clip            |
 
 Hotkeys are ignored while typing in an input/textarea/select. Holding a seek key
-scrubs quickly — seeking sets `video.currentTime` directly and is clamped to
+scrubs quickly: seeking sets `video.currentTime` directly and is clamped to
 `[0, duration]`, with no per-keypress React state update.
 
 ## Export formats
@@ -98,20 +109,20 @@ file 'adverts_1.mp4'
 file 'adverts_2.mp4'
 ```
 
-**clip.sh** — cuts each line of `clips.txt` from the source video (the `VIDEO`
-variable defaults to the loaded filename). **merge.sh** — `ffmpeg -f concat`.
+**clip.sh** cuts each line of `clips.txt` from the source video (the `VIDEO`
+variable defaults to the loaded filename). **merge.sh** runs `ffmpeg -f concat`.
 
 ## Persistence
 
 The clip list, video filename, prefix, and form fields are saved to
 `localStorage`. On reload the list and form are restored, but the video itself
-must be re-selected — browsers cannot persist local file access, so a banner
+must be re-selected: browsers cannot persist local file access, so a banner
 reminds you to pick the file again.
 
 ## Tech
 
-Next.js (App Router) · React · TypeScript · Tailwind CSS. No backend, no
-external services — everything runs in the browser.
+Next.js (App Router) · React · TypeScript · Tailwind CSS. No backend and no
+external services, so everything runs in the browser.
 
 ## Assumptions
 
