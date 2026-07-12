@@ -122,6 +122,14 @@ export default function Page() {
     };
   }, []);
 
+  // ---- Reflect the loaded filename in the tab title ----------------------
+  useEffect(() => {
+    document.title = videoName ? `${videoName} · Video Clipper` : "Video Clipper";
+    return () => {
+      document.title = "Video Clipper";
+    };
+  }, [videoName]);
+
   // ---- File loading ------------------------------------------------------
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -134,6 +142,8 @@ export default function Page() {
     objectUrlRef.current = url;
     setVideoUrl(url);
     setVideoName(file.name);
+    // A new source means a fresh clip list.
+    setClips([]);
     setRestoredMessage(null);
     setError(null);
     setCurrentTime(0);
